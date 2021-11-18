@@ -1,7 +1,7 @@
 <template>
     <form class="card auth-card container " @submit.prevent="submitHandler">
         <div class="card-content">
-            <span class="card-title">Регистрация</span>
+            <span class="card-title">Домашняя бухгалтерия</span>
             <div class="input-field form-group">
                 <input
                     class="form-control"
@@ -35,20 +35,6 @@
                        v-else-if=" $v.password.$anyDirty && !$v.password.minLength"
                 > password не должен быть меньше {{ $v.password.$params.minLength.min }} симвалов </small>
             </div>
-            <div class="input-field form-group">
-                <input
-                    class="form-control"
-                    id="confirm_password"
-                    type="password"
-                    v-model.trim="repeatPassword"
-                    :class="{invalid : $v.password.$anyDirty && !$v.repeatPassword.sameAsPassword}"
-                >
-                <label for="password">Пароль</label>
-                <small class="helper-text invalid"
-                       v-if=" $v.password.$anyDirty && !$v.repeatPassword.sameAsPassword"
-                >пароли не совпадают</small>
-
-            </div>
         </div>
         <div class="card-action form-group">
             <div>
@@ -57,12 +43,13 @@
                     type="submit"
                 >
                     Войти
-                    <i class="material-icons right">registration</i>
+                    <i class="material-icons right">send</i>
                 </button>
             </div>
 
             <p class="center">
-                <router-link to="{name:'login'}">Уже есть аккаунт</router-link>
+                Нет аккаунта?
+                <router-link :to="{name:'registration'}">Зарегистрироваться</router-link>
             </p>
         </div>
     </form>
@@ -70,7 +57,7 @@
 
 <script>
 
-    import {email,sameAs,required,minLength} from 'vuelidate/lib/validators'
+    import {email,required,minLength} from 'vuelidate/lib/validators'
     import jwt from "jsonwebtoken";
    // import masseges from '@/utils/masseges'
 
@@ -79,8 +66,7 @@
         data(){
             return {
                 email:'',
-                password :"",
-                repeatPassword: ''
+                password :""
             }
         },
         mounted() {
@@ -100,12 +86,11 @@
                 }
                 const formData = {
                     email: this.email,
-                    password: this.password,
-                    password_confirmation: this.repeatPassword
+                    password: this.password
                 }
                 try {
-                    await this.$store.dispatch('registration',formData)
-                    //this.$router.push('/')
+                    await this.$store.dispatch('login',formData)
+                    this.$router.push('/')
                 }catch (e) {
                     console.log(e)
                 }
@@ -113,10 +98,7 @@
         },
         validations:{
             email:{email,required},
-            password:{required,minLength:minLength(6)},
-            repeatPassword: {
-                sameAsPassword: sameAs('password')
-            }
+            password:{required,minLength:minLength(6)}
         }
 
     }
